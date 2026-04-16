@@ -1,0 +1,761 @@
+﻿<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charlieczech | QR platba</title>
+  <meta name="description" content="Statická HTML stránka Charlieczech pro generování QR plateb v CZK a EUR.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #f7efe2;
+      --sand: #efe2cf;
+      --amber: #d9a441;
+      --amber-deep: #b87c2d;
+      --ink: #16110e;
+      --ink-soft: rgba(239, 226, 207, 0.74);
+      --paper: rgba(255, 249, 241, 0.94);
+      --line: rgba(247, 239, 226, 0.12);
+      --shadow: 0 24px 60px rgba(8, 5, 3, 0.28);
+      --shadow-soft: 0 18px 40px rgba(16, 11, 8, 0.12);
+      --radius-xl: 30px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at top left, rgba(217, 164, 65, 0.18), transparent 28%),
+        radial-gradient(circle at 82% 16%, rgba(165, 77, 63, 0.14), transparent 24%),
+        linear-gradient(180deg, #120d0a 0%, #17110e 36%, #1f1612 100%);
+    }
+
+    img { display: block; max-width: 100%; }
+    button, input, textarea { font: inherit; }
+
+    .shell {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .page { padding: 28px 0 40px; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .brand img {
+      width: 186px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(247, 239, 226, 0.12);
+      color: var(--sand);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .panel-dark,
+    .panel-light {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .panel-dark {
+      position: relative;
+      padding: 42px;
+      background: linear-gradient(145deg, rgba(26, 18, 14, 0.94), rgba(33, 23, 18, 0.86));
+      border: 1px solid rgba(247, 239, 226, 0.1);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-dark::before {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(217, 164, 65, 0.1);
+    }
+
+    .panel-light {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 42px;
+      border: 1px solid rgba(58, 42, 31, 0.18);
+      color: #2f2118;
+      background:
+        linear-gradient(180deg, rgba(247, 239, 226, 0.96), rgba(239, 226, 207, 0.9)),
+        url("./public/images/papir-textura.png");
+      background-size: cover;
+      background-position: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .eyebrow, .label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(247, 239, 226, 0.1);
+      color: var(--sand);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      margin: 0;
+      font-family: "Anton", sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin-top: 22px;
+      max-width: 8ch;
+      font-size: clamp(3.8rem, 8vw, 6.8rem);
+      line-height: 0.98;
+    }
+
+    .lead {
+      margin: 22px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1.06rem;
+      line-height: 1.72;
+    }
+
+    .switcher {
+      display: inline-flex;
+      gap: 8px;
+      margin-top: 30px;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(247, 239, 226, 0.1);
+    }
+
+    .switcher button {
+      min-width: 108px;
+      min-height: 52px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(239, 226, 207, 0.72);
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .switcher button:hover {
+      color: var(--cream);
+      transform: translateY(-1px);
+    }
+
+    .switcher button.active {
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--amber), var(--amber-deep));
+      box-shadow: 0 14px 28px rgba(184, 124, 45, 0.28);
+    }
+
+    .fields { display: grid; gap: 18px; margin-top: 28px; }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      color: rgba(239, 226, 207, 0.56);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .amount-field, textarea {
+      width: 100%;
+      border: 1px solid rgba(247, 239, 226, 0.1);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.18s ease, background-color 0.18s ease;
+    }
+
+    .amount-field {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      min-height: 78px;
+    }
+
+    .amount-field:focus-within, textarea:focus {
+      border-color: rgba(217, 164, 65, 0.52);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .amount-field input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      outline: none;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .amount-field span {
+      color: rgba(239, 226, 207, 0.62);
+      font-size: 0.94rem;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    textarea {
+      min-height: 130px;
+      padding: 18px 20px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .fact {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(247, 239, 226, 0.08);
+    }
+
+    .fact strong, .summary strong {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .fact span {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: rgba(239, 226, 207, 0.82);
+    }
+
+    .panel-light__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .panel-light h2 {
+      margin-top: 14px;
+      font-size: clamp(2.3rem, 5vw, 3.5rem);
+      line-height: 1;
+    }
+
+    .qr-card {
+      margin-top: 30px;
+      max-width: 360px;
+      padding: 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(60, 42, 28, 0.14);
+      background: rgba(255, 248, 238, 0.92);
+      box-shadow: var(--shadow-soft);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .qr-box {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      border: 1px solid rgba(60, 42, 28, 0.1);
+      background: #f7efe2;
+      padding: 18px;
+      min-height: 296px;
+    }
+
+    .qr-box img, .qr-box canvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      object-fit: contain;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .summary-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+      min-width: 0;
+    }
+
+    .details-toggle-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+    }
+
+    .details-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 22px;
+      border: 1px solid rgba(60, 42, 28, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 246, 232, 0.86);
+      color: #5c4331;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.18s ease;
+    }
+
+    .details-toggle:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 246, 232, 0.96);
+    }
+
+    .details-panel {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.28s ease, opacity 0.18s ease;
+    }
+
+    .details-panel.is-open {
+      max-height: 1200px;
+      opacity: 1;
+    }
+
+    .summary {
+      padding: 16px 18px;
+      border-radius: 24px;
+      background: rgba(255, 246, 232, 0.74);
+      border: 1px solid rgba(60, 42, 28, 0.12);
+      min-width: 0;
+    }
+
+    .summary span {
+      display: block;
+      margin-top: 8px;
+      font-size: 1rem;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel-dark, .panel-light { padding: 30px 24px; }
+      .facts { grid-template-columns: 1fr; }
+      .summary-list { width: 100%; }
+    }
+
+    @media (max-width: 640px) {
+      .page { padding: 18px 0 28px; }
+      .shell { width: min(calc(100% - 20px), var(--max)); }
+      .topbar { flex-direction: column; align-items: flex-start; margin-bottom: 18px; }
+      .brand img { width: 160px; }
+      .panel-dark, .panel-light { padding: 22px 18px; border-radius: 24px; }
+      .switcher { width: 100%; }
+      .switcher button { flex: 1; min-width: 0; }
+      .amount-field { min-height: 68px; padding: 0 16px; }
+      .qr-card { max-width: none; padding: 16px; }
+      .qr-box { min-height: 0; padding: 14px; }
+      textarea { min-height: 110px; padding: 16px; }
+      .summary { padding: 14px 16px; border-radius: 20px; }
+      .summary-list { grid-template-columns: 1fr; }
+      .summary span, .fact span { font-size: 0.92rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell" >
+      <div class="topbar">
+        <a class="brand" href="#" >
+          <img src="./public/images/CHARLIECZECH_WHITE.png" alt="Charlieczech">
+        </a>
+        
+      </div>
+
+      <div class="grid">
+        <section class="panel-dark">
+           <h1>Platba</h1>
+          <p class="lead">
+            Jednoduchá platební obrazovka pro CZK a EUR. Vyber měnu, zadej částku a případnou poznámku
+            a QR kód se přepočítá okamžitě pod formulářem.
+          </p>
+
+          <div class="switcher" aria-label="Výběr měny">
+            <button id="currency-czk" class="active" type="button">CZK</button>
+            <button id="currency-eur" type="button">EUR</button>
+          </div>
+
+          <div class="fields">
+            <label>
+              <span class="field-label">Částka</span>
+              <div class="amount-field">
+                <input id="amount" type="text" inputmode="decimal" value="1" placeholder="0.00">
+                <span id="amount-currency">CZK</span>
+              </div>
+            </label>
+
+            <label>
+              <span class="field-label">Poznámka</span>
+              <textarea id="note" placeholder="Například číslo objednávky nebo krátká poznámka">Objednávka Charlieczech</textarea>
+            </label>
+          </div>
+
+          <div class="facts">
+            <div class="fact">
+              <strong>Příjemce</strong>
+              <span id="fact-recipient">Charlieczech s.r.o.</span>
+            </div>
+            <div class="fact">
+              <strong>Měna</strong>
+              <span id="fact-currency">CZK</span>
+            </div>
+            <div class="fact">
+              <strong>Účet</strong>
+              <span id="fact-account">3595077018/3030</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-light">
+          <div>
+            <div class="panel-light__top">
+              <div>
+                <div class="label">Živý náhled</div>
+                <h2>QR kód</h2>
+              </div>
+            </div>
+
+            <div class="qr-card">
+              <div class="qr-box">
+                <img id="qr-image" alt="QR kód platby" style="display: none;">
+                <canvas id="qr-canvas" aria-label="QR kód platby"></canvas>
+              </div>
+            </div>
+
+            <div class="details-toggle-wrap">
+              <button id="details-toggle" class="details-toggle" type="button" aria-expanded="false" aria-controls="details-panel">
+                Detaily
+              </button>
+            </div>
+
+            <div id="details-panel" class="details-panel">
+              <div class="summary-list">
+                <div class="summary">
+                  <strong>Částka</strong>
+                  <span id="summary-amount">1,00 CZK</span>
+                </div>
+                <div class="summary">
+                  <strong>Poznámka</strong>
+                  <span id="summary-note">Objednávka Charlieczech</span>
+                </div>
+                <div class="summary">
+                  <strong>Příjemce</strong>
+                  <span id="summary-recipient">Charlieczech s.r.o.</span>
+                </div>
+                <div class="summary">
+                  <strong>Účet</strong>
+                  <span id="summary-account">3595077018/3030</span>
+                </div>
+                <div class="summary">
+                  <strong>VS</strong>
+                  <span id="summary-vs">Bez VS</span>
+                </div>
+                <div class="summary">
+                  <strong>Splatnost</strong>
+                  <span id="summary-due">Bez splatnosti</span>
+                </div>
+                <div class="summary">
+                  <strong>Formát</strong>
+                  <span id="summary-format">Česká QR platba (SPD)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm";
+
+    const paymentConfig = {
+      CZK: {
+        currency: "CZK",
+        label: "České koruny",
+        recipient: "Charlieczech s.r.o.",
+        accountLabel: "3595077018/3030",
+        iban: convertCzechAccountToIban("3595077018", "3030"),
+        format: "Česká QR platba (SPD)"
+      },
+      EUR: {
+        currency: "EUR",
+        label: "Eura",
+        recipient: "Charlieczech s.r.o.",
+        accountLabel: "CZ3330300000003595077034",
+        iban: "CZ3330300000003595077034",
+        bic: "AIRACZPP",
+        variableSymbol: "2024000036",
+        paymentDueDate: "20260406",
+        format: "Slovenská QR platba (PAY by square)"
+      }
+    };
+
+    const state = { currency: "CZK" };
+
+    const amountInput = document.getElementById("amount");
+    const noteInput = document.getElementById("note");
+    const canvas = document.getElementById("qr-canvas");
+    const qrImage = document.getElementById("qr-image");
+    const detailsToggle = document.getElementById("details-toggle");
+    const detailsPanel = document.getElementById("details-panel");
+    const currencyButtons = {
+      CZK: document.getElementById("currency-czk"),
+      EUR: document.getElementById("currency-eur")
+    };
+
+    currencyButtons.CZK.addEventListener("click", () => setCurrency("CZK"));
+    currencyButtons.EUR.addEventListener("click", () => setCurrency("EUR"));
+    amountInput.addEventListener("input", render);
+    noteInput.addEventListener("input", render);
+    detailsToggle.addEventListener("click", toggleDetails);
+
+    setCurrency("CZK");
+
+    function setCurrency(currency) {
+      state.currency = currency;
+      currencyButtons.CZK.classList.toggle("active", currency === "CZK");
+      currencyButtons.EUR.classList.toggle("active", currency === "EUR");
+      document.getElementById("amount-currency").textContent = currency;
+      render();
+    }
+
+    function toggleDetails() {
+      const isOpen = detailsPanel.classList.toggle("is-open");
+      detailsToggle.setAttribute("aria-expanded", String(isOpen));
+      detailsToggle.textContent = isOpen ? "Skrýt detaily" : "Detaily";
+    }
+
+    async function render() {
+      const config = paymentConfig[state.currency];
+      const amount = parseAmount(amountInput.value);
+      const note = noteInput.value.trim();
+
+      document.getElementById("fact-currency").textContent = config.currency;
+      document.getElementById("fact-recipient").textContent = config.recipient;
+      document.getElementById("fact-account").textContent = config.accountLabel;
+      document.getElementById("summary-recipient").textContent = config.recipient;
+      document.getElementById("summary-account").textContent = config.accountLabel;
+      document.getElementById("summary-vs").textContent = config.variableSymbol || "Bez VS";
+      document.getElementById("summary-due").textContent = config.paymentDueDate ? formatDate(config.paymentDueDate) : "Bez splatnosti";
+      document.getElementById("summary-format").textContent = state.currency === "EUR" ? "Slovenská QR platba (PAY by square)" : config.format;
+      document.getElementById("summary-note").textContent = note || "Bez poznámky";
+      document.getElementById("summary-amount").textContent = amount !== null ? `${formatAmount(amount)} ${config.currency}` : "Zadej platnou částku";
+
+      const payload = amount === null
+        ? null
+        : state.currency === "CZK"
+          ? createPaymentPayload({
+              amount,
+              currency: state.currency,
+              note,
+              recipient: config.recipient,
+              iban: config.iban
+            })
+          : createQrGeneratorUrl({
+              amount,
+              iban: config.iban,
+              beneficiaryName: config.recipient,
+              variableSymbol: config.variableSymbol,
+              paymentDueDate: config.paymentDueDate
+            });
+
+      const context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!payload) {
+        qrImage.style.display = "none";
+        canvas.style.display = "block";
+        context.fillStyle = "#f4eadc";
+        context.fillRect(0, 0, 520, 520);
+        context.fillStyle = "#7a5840";
+        context.font = "500 18px Manrope";
+        context.textAlign = "center";
+        context.fillText("Zadej platnou částku", 260, 260);
+        return;
+      }
+
+      if (state.currency === "EUR") {
+        canvas.style.display = "none";
+        qrImage.style.display = "block";
+        qrImage.src = payload;
+        qrImage.style.mixBlendMode = "multiply";
+        return;
+      }
+
+      qrImage.style.display = "none";
+      canvas.style.display = "block";
+
+      await QRCode.toCanvas(canvas, payload, {
+        errorCorrectionLevel: "M",
+        margin: 1,
+        width: 520,
+        color: {
+          dark: "#16110e",
+          light: "#f7efe2"
+        }
+      });
+    }
+
+    function parseAmount(value) {
+      const normalized = value.replace(/\s+/g, "").replace(",", ".");
+      const amount = Number(normalized);
+      if (!Number.isFinite(amount) || amount <= 0) return null;
+      return Math.round(amount * 100) / 100;
+    }
+
+    function formatAmount(value) {
+      return new Intl.NumberFormat("cs-CZ", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function createPaymentPayload({ amount, currency, note, recipient, iban }) {
+      const payload = [
+        "SPD*1.0",
+        `ACC:${iban}`,
+        `AM:${amount.toFixed(2)}`,
+        `CC:${currency}`,
+        `RN:${sanitizePaymentText(recipient, 35)}`
+      ];
+
+      if (note) payload.push(`MSG:${sanitizePaymentText(note, 60)}`);
+      return payload.join("*");
+    }
+
+    function createQrGeneratorUrl({ amount, iban, beneficiaryName, variableSymbol, paymentDueDate }) {
+      const params = new URLSearchParams({
+        iban,
+        amount: amount.toFixed(2),
+        currency: "EUR",
+        size: "512",
+        transparent: "false",
+        mode: "none"
+      });
+
+      if (beneficiaryName) params.set("beneficiary_name", beneficiaryName);
+      if (variableSymbol) params.set("vs", variableSymbol);
+      if (paymentDueDate) params.set("due_date", formatDateForQrGenerator(paymentDueDate));
+
+      return `https://api.qrgenerator.sk/by-square/pay/qr.png?${params.toString()}`;
+    }
+
+    function sanitizePaymentText(value, limit) {
+      return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[*\r\n]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, limit);
+    }
+
+    function convertCzechAccountToIban(accountNumber, bankCode, prefix = "") {
+      const account = accountNumber.padStart(10, "0");
+      const accountPrefix = prefix.padStart(6, "0");
+      const bban = `${bankCode}${accountPrefix}${account}`;
+      const countryNumeric = "123500";
+      const remainder = mod97(`${bban}${countryNumeric}`);
+      const checkDigits = String(98 - remainder).padStart(2, "0");
+      return `CZ${checkDigits}${bban}`;
+    }
+
+    function mod97(value) {
+      let remainder = 0;
+      for (const char of value) remainder = (remainder * 10 + Number(char)) % 97;
+      return remainder;
+    }
+
+    function formatDate(value) {
+      if (/^\d{8}$/.test(value)) return `${value.slice(6, 8)}.${value.slice(4, 6)}.${value.slice(0, 4)}`;
+      const parts = value.split("-");
+      if (parts.length === 3) return `${parts[2]}.${parts[1]}.${parts[0]}`;
+      return value;
+    }
+
+    function formatDateForQrGenerator(value) {
+      if (/^\d{8}$/.test(value)) return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+      return value;
+    }
+  </script>
+</body>
+</html>
