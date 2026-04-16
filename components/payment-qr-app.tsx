@@ -7,7 +7,6 @@ type CurrencyCode = "CZK" | "EUR";
 
 type PaymentConfig = {
   currency: CurrencyCode;
-  label: string;
   recipient: string;
   accountLabel: string;
   iban?: string;
@@ -20,7 +19,6 @@ type PaymentConfig = {
 const PAYMENT_CONFIG: Record<CurrencyCode, PaymentConfig> = {
   CZK: {
     currency: "CZK",
-    label: "Ceske koruny",
     recipient: "Charlieczech s.r.o.",
     accountLabel: "3595077018/3030",
     iban: convertCzechAccountToIban("3595077018", "3030"),
@@ -28,7 +26,6 @@ const PAYMENT_CONFIG: Record<CurrencyCode, PaymentConfig> = {
   },
   EUR: {
     currency: "EUR",
-    label: "Eura",
     recipient: "Charlieczech s.r.o.",
     accountLabel: "CZ3330300000003595077034",
     iban: "CZ3330300000003595077034",
@@ -44,12 +41,12 @@ const currencyOptions: CurrencyCode[] = ["CZK", "EUR"];
 export function PaymentQrApp() {
   const [currency, setCurrency] = useState<CurrencyCode>("CZK");
   const [amount, setAmount] = useState("1");
-  const [note, setNote] = useState("Objednavka Charlieczech");
+  const [note, setNote] = useState("Objednávka Charlieczech");
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [qrError, setQrError] = useState("");
 
   const config = PAYMENT_CONFIG[currency];
-
   const normalizedAmount = useMemo(() => parseAmount(amount), [amount]);
 
   const payload = useMemo(() => {
@@ -114,7 +111,7 @@ export function PaymentQrApp() {
       .catch(() => {
         if (active) {
           setQrCodeUrl("");
-          setQrError("QR kod se nepodarilo vygenerovat.");
+          setQrError("QR kód se nepodařilo vygenerovat.");
         }
       });
 
@@ -123,129 +120,162 @@ export function PaymentQrApp() {
     };
   }, [currency, payload]);
 
+  const formattedAmount =
+    normalizedAmount !== null ? `${formatAmount(normalizedAmount)} ${currency}` : "Zadej platnou částku";
+  const formatLabel = currency === "EUR" ? "Slovenská QR platba (PAY by square)" : "Česká QR platba (SPD)";
+  const dueDateLabel = config.paymentDueDate ? formatDate(config.paymentDueDate) : "Bez splatnosti";
+  const variableSymbolLabel = config.variableSymbol ?? "Bez VS";
+
   return (
-    <section className="section-shell py-10 sm:py-14 lg:py-20">
-      <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-        <div className="panel relative overflow-hidden border-white/10 bg-[linear-gradient(145deg,rgba(26,18,14,0.95),rgba(36,24,19,0.86))] p-6 shadow-glow sm:p-8 lg:p-10">
-          <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-lager/10 blur-2xl" />
-          <p className="eyebrow relative z-10">QR platba Charlieczech</p>
-          <h1 className="display-title relative z-10 mt-5 max-w-[10ch] text-5xl uppercase leading-[0.94] text-cream sm:text-6xl lg:text-7xl">
-            Platba bez zdržení
-          </h1>
-          <p className="relative z-10 mt-5 max-w-2xl text-base leading-8 text-sand/74 sm:text-lg">
-            Jednoduchá platební obrazovka pro CZK a EUR. Vyber měnu, zadej částku a případnou poznámku a QR kód se
-            přepočítá okamžitě pod formulářem.
-          </p>
-
-          <div className="relative z-10 mt-8 inline-flex rounded-full border border-white/10 bg-white/5 p-1">
-            {currencyOptions.map((option) => {
-              const isActive = option === currency;
-
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setCurrency(option)}
-                  className={`rounded-full px-5 py-3 text-sm font-semibold uppercase tracking-[0.22em] transition sm:px-6 ${
-                    isActive
-                      ? "bg-lager text-ink shadow-[0_10px_24px_rgba(217,164,65,0.3)]"
-                      : "text-sand/72 hover:bg-white/8 hover:text-cream"
-                  }`}
-                >
-                  {option}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="relative z-10 mt-8 grid gap-4">
-            <label className="block">
-              <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.26em] text-sand/54">
-                Částka
-              </span>
-              <div className="flex items-center rounded-[24px] border border-white/10 bg-white/6 px-5 py-4 transition focus-within:border-lager/50 focus-within:bg-white/8">
-                <input
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  inputMode="decimal"
-                  placeholder="0.00"
-                  className="min-w-0 flex-1 bg-transparent text-2xl font-semibold tracking-[0.02em] text-cream outline-none placeholder:text-sand/28 sm:text-3xl"
-                />
-                <span className="ml-4 text-sm font-semibold uppercase tracking-[0.26em] text-sand/62">{currency}</span>
-              </div>
-            </label>
-
-            <label className="block">
-              <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.26em] text-sand/54">
-                Poznámka
-              </span>
-              <textarea
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                rows={4}
-                placeholder="Například číslo objednávky nebo krátká poznámka"
-                className="w-full rounded-[24px] border border-white/10 bg-white/6 px-5 py-4 text-base leading-7 text-cream outline-none transition placeholder:text-sand/28 focus:border-lager/50 focus:bg-white/8"
-              />
-            </label>
-          </div>
-
-          <div className="relative z-10 mt-8 grid gap-3 sm:grid-cols-3">
-            <InfoPill label="Měna" value={config.currency} />
-            <InfoPill label="Příjemce" value={config.recipient} />
-            <InfoPill label="Účet" value={config.accountLabel} />
-            {currency === "EUR" && config.variableSymbol ? <InfoPill label="VS" value={config.variableSymbol} /> : null}
-            {currency === "EUR" && config.paymentDueDate ? <InfoPill label="Splatnost" value={formatDate(config.paymentDueDate)} /> : null}
-          </div>
+    <section className="section-shell py-6 sm:py-8 lg:py-10">
+      <div className="mx-auto w-full max-w-[1180px]">
+        <div className="mb-6 flex justify-center">
+          <a href="/" className="inline-flex">
+            <img
+              src="/images/CHARLIECZECH_WHITE.png"
+              alt="Charlieczech"
+              className="h-auto w-[160px] object-contain sm:w-[186px]"
+            />
+          </a>
         </div>
 
-        <div className="panel-light paper-panel flex min-h-[560px] flex-col justify-between overflow-hidden p-6 sm:p-8 lg:p-10">
-          <div>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#7f5a39]">Živý náhled</p>
-                <h2 className="mt-3 text-3xl font-semibold text-[#2f2118] sm:text-4xl">QR kód k okamžité platbě</h2>
-              </div>
-              <div className="rounded-full border border-[#4e3725]/12 bg-[#f8f0e3]/75 px-4 py-2 text-sm font-semibold uppercase tracking-[0.24em] text-[#7f5a39]">
-                {config.label}
-              </div>
+        <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
+          <section className="panel relative overflow-hidden border-white/10 bg-[linear-gradient(145deg,rgba(26,18,14,0.94),rgba(33,23,18,0.86))] px-5 py-6 shadow-glow sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+            <div className="absolute -right-16 -top-16 h-[220px] w-[220px] rounded-full bg-lager/10" />
+
+            <h1 className="relative z-10 font-display text-[clamp(3.8rem,8vw,6.8rem)] uppercase leading-[0.98] tracking-[0.02em] text-cream">
+              Platba
+            </h1>
+
+            <p className="relative z-10 mt-5 max-w-[60ch] text-base leading-8 text-sand/75 sm:text-[1.06rem]">
+              Jednoduchá platební obrazovka pro CZK a EUR. Vyber měnu, zadej částku a případnou poznámku a QR kód se
+              přepočítá okamžitě pod formulářem.
+            </p>
+
+            <div className="relative z-10 mt-8 inline-flex w-full rounded-full border border-white/10 bg-white/5 p-1 sm:w-auto">
+              {currencyOptions.map((option) => {
+                const isActive = option === currency;
+
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setCurrency(option)}
+                    className={`min-h-[52px] flex-1 rounded-full px-5 text-sm font-extrabold uppercase tracking-[0.18em] transition sm:min-w-[108px] sm:flex-none sm:px-6 ${
+                      isActive
+                        ? "bg-[linear-gradient(135deg,#d9a441,#b87c2d)] text-ink shadow-[0_14px_28px_rgba(184,124,45,0.28)]"
+                        : "text-sand/70 hover:-translate-y-px hover:text-cream"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="mt-8 grid gap-6 xl:grid-cols-[280px_1fr]">
-              <div className="rounded-[30px] border border-[#3c2a1c]/14 bg-[#fff8ee]/90 p-5 shadow-card">
-                <div className="aspect-square overflow-hidden rounded-[24px] border border-[#3c2a1c]/10 bg-[#f7efe2] p-4">
+            <div className="relative z-10 mt-7 grid gap-4">
+              <label className="block">
+                <span className="mb-2.5 block text-xs font-extrabold uppercase tracking-[0.22em] text-sand/55">
+                  Částka
+                </span>
+                <div className="flex min-h-[68px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 px-4 transition focus-within:border-lager/50 focus-within:bg-white/8 sm:min-h-[78px] sm:px-5">
+                  <input
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className="min-w-0 flex-1 bg-transparent text-[clamp(1.6rem,4vw,2.2rem)] font-extrabold tracking-[0.02em] text-cream outline-none placeholder:text-sand/30"
+                  />
+                  <span className="text-sm font-extrabold uppercase tracking-[0.24em] text-sand/65">{currency}</span>
+                </div>
+              </label>
+
+              <label className="block">
+                <span className="mb-2.5 block text-xs font-extrabold uppercase tracking-[0.22em] text-sand/55">
+                  Poznámka
+                </span>
+                <textarea
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  rows={4}
+                  placeholder="Například číslo objednávky nebo krátká poznámka"
+                  className="min-h-[110px] w-full resize-y rounded-[24px] border border-white/10 bg-white/5 px-4 py-4 text-base leading-7 text-cream outline-none transition placeholder:text-sand/30 focus:border-lager/50 focus:bg-white/8 sm:min-h-[130px] sm:px-5"
+                />
+              </label>
+            </div>
+
+            <div className="relative z-10 mt-8 grid gap-3 sm:grid-cols-3">
+              <InfoPill label="Příjemce" value={config.recipient} />
+              <InfoPill label="Měna" value={config.currency} />
+              <InfoPill label="Účet" value={config.accountLabel} />
+            </div>
+          </section>
+
+          <section
+            className="panel-light flex flex-col justify-between rounded-[30px] border border-[#3a2a1f]/18 px-5 py-6 text-[#2f2118] shadow-card sm:px-6 sm:py-8 lg:px-10 lg:py-10"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, rgba(247, 239, 226, 0.96), rgba(239, 226, 207, 0.9)), url('/images/papir-textura.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center"
+            }}
+          >
+            <div>
+              <div className="flex justify-center text-center">
+                <div>
+                  <div className="inline-flex min-h-10 items-center rounded-full border border-[#3c2a1c]/12 bg-[#fff6e8]/75 px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-[#7f5a39]">
+                    Živý náhled
+                  </div>
+                  <h2 className="mt-3 font-display text-[clamp(2.3rem,5vw,3.5rem)] uppercase leading-none tracking-[0.02em]">
+                    QR kód
+                  </h2>
+                </div>
+              </div>
+
+              <div className="mx-auto mt-8 w-full max-w-[360px] rounded-[30px] border border-[#3c2a1c]/14 bg-[rgba(255,248,238,0.92)] p-4 shadow-card sm:p-[22px]">
+                <div className="flex aspect-square min-h-[260px] items-center justify-center rounded-[24px] border border-[#3c2a1c]/10 bg-[#f7efe2] p-4 sm:min-h-[296px] sm:p-[18px]">
                   {qrCodeUrl ? (
                     <img
                       src={qrCodeUrl}
-                      alt={`QR kod pro platbu v mene ${currency}`}
-                      className={`h-full w-full object-contain ${currency === "EUR" ? "mix-blend-multiply" : ""}`}
+                      alt={`QR kód pro platbu v měně ${currency}`}
+                      className={`h-full w-full max-h-full max-w-full object-contain ${currency === "EUR" ? "mix-blend-multiply" : ""}`}
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center rounded-[18px] bg-[#f4eadc] px-6 text-center text-sm leading-6 text-[#7a5840]">
+                    <div className="rounded-[18px] bg-[#f4eadc] px-6 py-5 text-center text-sm leading-6 text-[#7a5840]">
                       {qrError || "Zadej platnou částku a QR kód se objeví okamžitě."}
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <SummaryRow label="Částka" value={normalizedAmount !== null ? `${formatAmount(normalizedAmount)} ${currency}` : "Zadej platnou částku"} />
-                <SummaryRow label="Poznámka" value={note.trim() || "Bez poznámky"} />
-                <SummaryRow label="Příjemce" value={config.recipient} />
-                <SummaryRow label="Účet" value={config.accountLabel} />
-                {currency === "EUR" && config.variableSymbol ? <SummaryRow label="VS" value={config.variableSymbol} /> : null}
-                {currency === "EUR" && config.paymentDueDate ? <SummaryRow label="Splatnost" value={formatDate(config.paymentDueDate)} /> : null}
-                <SummaryRow
-                  label="Formát"
-                  value={currency === "EUR" ? "Slovenská QR platba (PAY by square)" : "Česká QR platba (SPD)"}
-                />
+              <div className="mt-[18px] flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen((value) => !value)}
+                  aria-expanded={detailsOpen}
+                  aria-controls="details-panel"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#3c2a1c]/14 bg-[rgba(255,246,232,0.86)] px-[22px] text-[0.82rem] font-extrabold uppercase tracking-[0.2em] text-[#5c4331] transition hover:-translate-y-px hover:bg-[rgba(255,246,232,0.96)]"
+                >
+                  {detailsOpen ? "Skrýt detaily" : "Detaily"}
+                </button>
+              </div>
+
+              <div
+                id="details-panel"
+                className={`overflow-hidden transition-all duration-300 ${detailsOpen ? "mt-[18px] max-h-[1200px] opacity-100" : "max-h-0 opacity-0"}`}
+              >
+                <div className="grid gap-[14px] sm:grid-cols-2">
+                  <SummaryRow label="Částka" value={formattedAmount} />
+                  <SummaryRow label="Poznámka" value={note.trim() || "Bez poznámky"} />
+                  <SummaryRow label="Příjemce" value={config.recipient} />
+                  <SummaryRow label="Účet" value={config.accountLabel} />
+                  <SummaryRow label="VS" value={variableSymbolLabel} />
+                  <SummaryRow label="Splatnost" value={dueDateLabel} />
+                  <SummaryRow label="Formát" value={formatLabel} />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8 rounded-[26px] border border-[#3c2a1c]/12 bg-[#f8efdf]/80 p-5 text-sm leading-7 text-[#5c4331]">
-            Návrh je připravený jako jednoduchý responzivní formulář ve vizuálu Charlieczech. CZK používá českou QR
-            platbu a EUR generuje funkční slovenský Pay by square.
-          </div>
+          </section>
         </div>
       </div>
     </section>
@@ -254,18 +284,18 @@ export function PaymentQrApp() {
 
 function InfoPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[22px] border border-white/10 bg-white/6 p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-sand/48">{label}</p>
-      <p className="mt-2 text-sm leading-6 text-cream">{value}</p>
+    <div className="rounded-[18px] border border-white/10 bg-white/5 p-[18px]">
+      <p className="text-[0.74rem] font-extrabold uppercase tracking-[0.2em] text-sand/50">{label}</p>
+      <p className="mt-2 text-[0.95rem] leading-[1.55] text-sand/85">{value}</p>
     </div>
   );
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[24px] border border-[#3c2a1c]/12 bg-[#fff6e8]/74 px-5 py-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#826143]">{label}</p>
-      <p className="mt-2 text-base leading-7 text-[#2f2118]">{value}</p>
+    <div className="min-w-0 rounded-[24px] border border-[#3c2a1c]/12 bg-[rgba(255,246,232,0.74)] px-[18px] py-4 sm:px-5">
+      <p className="text-[0.74rem] font-extrabold uppercase tracking-[0.2em] text-[#826143]">{label}</p>
+      <p className="mt-2 break-words text-base leading-[1.65] text-[#2f2118]">{value}</p>
     </div>
   );
 }
