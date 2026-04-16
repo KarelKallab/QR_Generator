@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink text-cream antialiased;
+  background-image:
+    radial-gradient(circle at top, rgba(217, 164, 65, 0.12), transparent 24%),
+    linear-gradient(180deg, #120d0a 0%, #16110e 35%, #1d1512 100%);
+}
+
+* {
+  border-color: rgba(247, 239, 226, 0.12);
+}
+
+.section-shell {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.eyebrow {
+  @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-sand/70;
+}
+
+.display-title {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.editorial-title {
+  font-family: var(--font-editorial), serif;
+}
+
+.panel {
+  @apply rounded-[28px] border border-white/10 bg-white/5 backdrop-blur;
+}
+
+.panel-light {
+  @apply rounded-[28px] border border-ink/10 bg-paper-glow text-ink shadow-card;
+}
+
+.paper-panel {
+  @apply border border-[#3a2a1f]/20 text-[#2f2118];
+  background-image:
+    linear-gradient(180deg, rgba(247, 239, 226, 0.95), rgba(235, 219, 195, 0.92)),
+    url("/images/papir-textura.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.poster-button {
+  @apply inline-flex items-center justify-center border border-[#3c2a1c] bg-[#f1e1c4] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#2f2118] transition hover:bg-[#f7ead3];
+}
+
+.poster-dark-button {
+  @apply inline-flex items-center justify-center border border-white/20 bg-white/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-cream transition hover:bg-white/15;
+}
+
+.cta-primary {
+  @apply inline-flex items-center justify-center rounded-full bg-lager px-5 py-3 text-sm font-semibold text-ink transition hover:bg-[#efba56];
+}
+
+.cta-secondary {
+  @apply inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-cream transition hover:bg-white/10;
+}
+
+.image-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.45)),
+    radial-gradient(circle at top left, rgba(255, 213, 128, 0.28), transparent 32%);
+}
