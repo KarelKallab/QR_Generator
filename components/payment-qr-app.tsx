@@ -126,7 +126,7 @@ export function PaymentQrApp() {
 
   return (
     <section className="section-shell py-6 sm:py-8 lg:py-10">
-      <div className="mx-auto w-full max-w-[1180px]">
+      <div className="mx-auto min-w-0 w-full max-w-[1180px]">
         <div className="mb-6 flex justify-center">
           <a href="/" className="inline-flex">
             <img
@@ -137,8 +137,8 @@ export function PaymentQrApp() {
           </a>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-          <section className="panel relative overflow-hidden border-white/10 bg-[linear-gradient(145deg,rgba(26,18,14,0.94),rgba(33,23,18,0.86))] px-5 py-6 shadow-glow sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-[1.02fr_0.98fr]">
+          <section className="panel relative min-w-0 overflow-hidden border-white/10 bg-[linear-gradient(145deg,rgba(26,18,14,0.94),rgba(33,23,18,0.86))] px-4 py-6 shadow-glow sm:px-6 sm:py-8 lg:px-10 lg:py-10">
             <div className="absolute -right-16 -top-16 h-[220px] w-[220px] rounded-full bg-lager/10" />
 
             <h1 className="display-title relative z-10 text-[clamp(3.8rem,8vw,6.8rem)] uppercase leading-[0.98] tracking-[0.02em] text-cream">
@@ -150,7 +150,7 @@ export function PaymentQrApp() {
               přepočítá okamžitě pod formulářem.
             </p>
 
-            <div className="relative z-10 mt-8 inline-flex w-full rounded-full border border-white/10 bg-white/5 p-1 sm:w-auto">
+            <div className="relative z-10 mt-8 inline-flex w-full min-w-0 rounded-full border border-white/10 bg-white/5 p-1 sm:w-auto">
               {currencyOptions.map((option) => {
                 const isActive = option === currency;
 
@@ -176,15 +176,17 @@ export function PaymentQrApp() {
                 <span className="mb-2.5 block text-xs font-extrabold uppercase tracking-[0.22em] text-sand/55">
                   Částka
                 </span>
-                <div className="flex min-h-[68px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 px-4 transition focus-within:border-lager/50 focus-within:bg-white/8 sm:min-h-[78px] sm:px-5">
+                <div className="flex min-h-[68px] min-w-0 w-full items-center gap-3 overflow-hidden rounded-[24px] border border-white/10 bg-white/5 px-4 transition focus-within:border-lager/50 focus-within:bg-white/8 sm:min-h-[78px] sm:gap-4 sm:px-5">
                   <input
                     value={amount}
                     onChange={(event) => setAmount(event.target.value)}
                     inputMode="decimal"
                     placeholder="0.00"
-                    className="min-w-0 flex-1 bg-transparent text-[clamp(1.6rem,4vw,2.2rem)] font-extrabold tracking-[0.02em] text-cream outline-none placeholder:text-sand/30"
+                    className="min-w-0 w-0 flex-1 bg-transparent text-[clamp(1.6rem,4vw,2.2rem)] font-extrabold tracking-[0.02em] text-cream outline-none placeholder:text-sand/30"
                   />
-                  <span className="text-sm font-extrabold uppercase tracking-[0.24em] text-sand/65">{currency}</span>
+                  <span className="shrink-0 text-xs font-extrabold uppercase tracking-[0.18em] text-sand/65 sm:text-sm sm:tracking-[0.24em]">
+                    {currency}
+                  </span>
                 </div>
               </label>
 
@@ -197,7 +199,7 @@ export function PaymentQrApp() {
                   onChange={(event) => setNote(event.target.value)}
                   rows={4}
                   placeholder="Například číslo objednávky nebo krátká poznámka"
-                  className="min-h-[110px] w-full resize-y rounded-[24px] border border-white/10 bg-white/5 px-4 py-4 text-base leading-7 text-cream outline-none transition placeholder:text-sand/30 focus:border-lager/50 focus:bg-white/8 sm:min-h-[130px] sm:px-5"
+                  className="block min-h-[110px] w-full min-w-0 resize-y rounded-[24px] border border-white/10 bg-white/5 px-4 py-4 text-base leading-7 text-cream outline-none transition placeholder:text-sand/30 focus:border-lager/50 focus:bg-white/8 sm:min-h-[130px] sm:px-5"
                 />
               </label>
             </div>
@@ -210,7 +212,7 @@ export function PaymentQrApp() {
           </section>
 
           <section
-            className="panel-light flex flex-col justify-between rounded-[30px] border border-[#3a2a1f]/18 px-5 py-6 text-[#2f2118] shadow-card sm:px-6 sm:py-8 lg:px-10 lg:py-10"
+            className="panel-light min-w-0 flex flex-col justify-between rounded-[30px] border border-[#3a2a1f]/18 px-4 py-6 text-[#2f2118] shadow-card sm:px-6 sm:py-8 lg:px-10 lg:py-10"
             style={{
               backgroundImage:
                 "linear-gradient(180deg, rgba(247, 239, 226, 0.96), rgba(239, 226, 207, 0.9)), url('/images/papir-textura.png')",
