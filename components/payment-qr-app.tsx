@@ -10,7 +10,6 @@ type PaymentConfig = {
   recipient: string;
   accountLabel: string;
   iban?: string;
-  bic?: string;
   variableSymbol?: string;
   paymentDueDate?: string;
   enabled: boolean;
@@ -29,7 +28,6 @@ const PAYMENT_CONFIG: Record<CurrencyCode, PaymentConfig> = {
     recipient: "Charlieczech s.r.o.",
     accountLabel: "CZ3330300000003595077034",
     iban: "CZ3330300000003595077034",
-    bic: "AIRACZPP",
     variableSymbol: "2024000036",
     paymentDueDate: "20260406",
     enabled: true
@@ -143,7 +141,7 @@ export function PaymentQrApp() {
           <section className="panel relative overflow-hidden border-white/10 bg-[linear-gradient(145deg,rgba(26,18,14,0.94),rgba(33,23,18,0.86))] px-5 py-6 shadow-glow sm:px-6 sm:py-8 lg:px-10 lg:py-10">
             <div className="absolute -right-16 -top-16 h-[220px] w-[220px] rounded-full bg-lager/10" />
 
-            <h1 className="relative z-10 font-display text-[clamp(3.8rem,8vw,6.8rem)] uppercase leading-[0.98] tracking-[0.02em] text-cream">
+            <h1 className="display-title relative z-10 text-[clamp(3.8rem,8vw,6.8rem)] uppercase leading-[0.98] tracking-[0.02em] text-cream">
               Platba
             </h1>
 
@@ -223,10 +221,7 @@ export function PaymentQrApp() {
             <div>
               <div className="flex justify-center text-center">
                 <div>
-                  <div className="inline-flex min-h-10 items-center rounded-full border border-[#3c2a1c]/12 bg-[#fff6e8]/75 px-4 text-xs font-extrabold uppercase tracking-[0.2em] text-[#7f5a39]">
-                    Živý náhled
-                  </div>
-                  <h2 className="mt-3 font-display text-[clamp(2.3rem,5vw,3.5rem)] uppercase leading-none tracking-[0.02em]">
+                  <h2 className="display-title text-[clamp(2.3rem,5vw,3.5rem)] uppercase leading-none tracking-[0.02em] text-[#2f2118]">
                     QR kód
                   </h2>
                 </div>

@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Fraunces, Inter } from "next/font/google";
+import { Anton, Manrope } from "next/font/google";
 import "./globals.css";
 
-const display = Bebas_Neue({
+const display = Anton({
   variable: "--font-display",
   subsets: ["latin"],
   weight: "400"
 });
 
-const editorial = Fraunces({
-  variable: "--font-editorial",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"]
-});
-
-const body = Inter({
+const body = Manrope({
   variable: "--font-body",
-  subsets: ["latin", "latin-ext"]
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "700", "800"]
 });
 
 export const metadata: Metadata = {
@@ -25,11 +20,11 @@ export const metadata: Metadata = {
     default: "Charlieczech | QR platba",
     template: "%s | Charlieczech QR"
   },
-  description: "Jednoducha aplikace pro generovani QR plateb v CZK a EUR pro Charlieczech.",
+  description: "Jednoduchá aplikace pro generování QR plateb v CZK a EUR pro Charlieczech.",
   keywords: ["charlieczech", "qr platba", "czk", "eur"],
   openGraph: {
     title: "Charlieczech | QR platba",
-    description: "Jednoducha aplikace pro generovani QR plateb v CZK a EUR pro Charlieczech.",
+    description: "Jednoduchá aplikace pro generování QR plateb v CZK a EUR pro Charlieczech.",
     url: "https://example.com",
     siteName: "Charlieczech QR",
     locale: "cs_CZ",
@@ -43,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="cs" className={`${display.variable} ${editorial.variable} ${body.variable}`}>
-      <body className="font-[var(--font-body)]">
+    <html lang="cs" className={`${display.variable} ${body.variable}`}>
+      <body>
         <div className="relative min-h-screen overflow-hidden">
           <div className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-hero-glow" />
           <main>{children}</main>

@@ -12,6 +12,7 @@ html {
 
 body {
   @apply bg-ink text-cream antialiased;
+  font-family: var(--font-body), sans-serif;
   background-image:
     radial-gradient(circle at top, rgba(217, 164, 65, 0.12), transparent 24%),
     linear-gradient(180deg, #120d0a 0%, #16110e 35%, #1d1512 100%);
